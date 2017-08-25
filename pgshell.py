@@ -29,7 +29,7 @@ class PBuffer(Buffer):
             doc = self.document
 
             return not _multiline_evaluator(doc.text)
-        super(self.__class__, self).__init__(*args, is_multiline=is_multiline,
+        super(self.__class__, self).__init__(*args, is_multiline=True,
                                              tempfile_suffix='.sql', **kwargs)
 
 
