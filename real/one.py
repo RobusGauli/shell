@@ -23,7 +23,7 @@ registry = manager.registry
 
 #attach the handler to the key using eh simle decorarion
 #create a buffer to pass on to application istance
-custom_style = { Token.Toolbar: '#ffffff bg:#333333', token.On: '#666', token.Off: '#999'}
+custom_style = { Token.Toolbar: '#ffffff bg:#333333', token.On: '#666', token.Off: '#999', Token.Prompt: '#00ff00', Token.Continuation: '#00ff00'}
 style = PygmentsStyle.from_defaults(style_dict=custom_style, pygments_style_cls=pygments.styles.get_style_by_name('native'))
 class PBuffer(Buffer):
 	def __init__(self, always_multiline, *args, **kwargs):
@@ -46,8 +46,11 @@ def _(event):
 	buf = event.cli.current_buffer
 	buf.always_multiline = not buf.always_multiline
 
-get_prompt_tokens = lambda _: [(Token.Prompt, '>>>>')]
-get_continuation_tokens = lambda cli, width: [(Token.Continuation, '.' * width + ' ')]
+get_prompt_tokens = lambda _: [(Token.Prompt, '#>')]
+get_continuation_tokens = lambda cli, width: [(Token.Continuation, '.' * (width-1) +  ' ' )]
+
+def get(cli, width):
+	return [(Token.Continuation, '.' * (width - 1) + 1)]
 
 
 def get_toolbar_tokens(cli):
@@ -67,7 +70,7 @@ def get_toolbar_tokens(cli):
 layout = create_prompt_layout(
 	lexer=PygmentsLexer(GoLexer),
 	get_prompt_tokens=get_prompt_tokens,
-	get_continuation_tokens=get_continuation_tokens,
+	get_continuation_tokens=get,
 	get_bottom_toolbar_tokens=get_toolbar_tokens	
 )
 
