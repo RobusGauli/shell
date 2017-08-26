@@ -37,20 +37,30 @@ class PBuffer(Buffer):
 		super(self.__class__, self).__init__(*args, is_multiline=is_multiline, **kwargs, accept_action=AcceptAction.RETURN_DOCUMENT)
 buffer = PBuffer(always_multiline=True)
 
+snippets = 'package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Thisis cool")\n}\n'
 @registry.add_binding(Keys.ControlQ)
 def exit(event):
 	event.cli.set_return_value('this is the valut that was returned ')
+
+@registry.add_binding(Keys.Tab)
+def _(event):
+	buf = event.cli.current_buffer
+	buf.insert_text(' ' * 4)
 
 @registry.add_binding(Keys.F4)
 def _(event):
 	buf = event.cli.current_buffer
 	buf.always_multiline = not buf.always_multiline
 
-get_prompt_tokens = lambda _: [(Token.Prompt, '#>')]
-get_continuation_tokens = lambda cli, width: [(Token.Continuation, '.' * (width-1) +  ' ' )]
+@registry.add_binding(Keys.ControlA)
+def _(event):
+	buff = event.cli.current_buffer
+	buff.insert_text(snippets, move_cursor=False)
+	buff.cursor_down(count=3)
 
-def get(cli, width):
-	return [(Token.Continuation, '.' * (width - 1) + 1)]
+get_prompt_tokens = lambda _: [(Token.Prompt, '#> ')]
+get_continuation_tokens = lambda cli, width: [(Token.Continuation, '.' * (width - 1) +  ' ' )]
+
 
 
 def get_toolbar_tokens(cli):
@@ -70,8 +80,9 @@ def get_toolbar_tokens(cli):
 layout = create_prompt_layout(
 	lexer=PygmentsLexer(GoLexer),
 	get_prompt_tokens=get_prompt_tokens,
-	get_continuation_tokens=get,
-	get_bottom_toolbar_tokens=get_toolbar_tokens	
+	get_continuation_tokens=get_continuation_tokens,
+	get_bottom_toolbar_tokens=get_toolbar_tokens,
+	multiline=True	
 )
 
 
